@@ -1,0 +1,60 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  engineType = "library"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String   @id @default(cuid())
+  email         String   @unique
+  passwordHash  String
+  name          String
+  role          String   @default("USER")
+  createdAt     DateTime @default(now())
+  generations   Generation[]
+  feedback      Feedback[]
+}
+
+model Generation {
+  id              String   @id @default(cuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id])
+  prospectProfile String
+  objective       String
+  constraints     String?
+  promptVersion   String   // e.g. "v4"
+  rawAiResponse   String
+  emails          String     // array of 5: { day, subject, body, cta }
+  responseTimeMs  Int?
+  createdAt       DateTime @default(now())
+  feedback        Feedback?
+}
+
+model Feedback {
+  id           String     @id @default(cuid())
+  generationId String     @unique
+  generation   Generation @relation(fields: [generationId], references: [id])
+  userId       String
+  user         User       @relation(fields: [userId], references: [id])
+  rating       Int        // 1-5
+  thumbsUp     Boolean?
+  comment      String?
+  createdAt    DateTime   @default(now())
+}
+
+model Template {
+  id              String   @id @default(cuid())
+  name            String
+  prospectProfile String
+  objective       String
+  constraints     String?
+  createdBy       String
+  createdAt       DateTime @default(now())
+}
