@@ -23,6 +23,7 @@ const templateSchema = z.object({
 
 export const dynamic = "force-dynamic";
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export async function GET(req: Request) {
   try {
     const session = await getServerSession(authOptions);
